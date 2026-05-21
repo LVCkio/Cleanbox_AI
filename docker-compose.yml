@@ -1,0 +1,104 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────
+# CleanInbox AI — Docker Compose (Full Stack)
+# Services: api | db | pgadmin | frontend
+# ─────────────────────────────────────────────────────
+
+services:
+
+  # ── 1. FastAPI Backend ──────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cleaninbox_api
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://cleaninbox:secret@db:5432/cleaninbox_db
+      SECRET_KEY: ${SECRET_KEY:-super-secret-change-in-production-32chars}
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 60
+      MAILCHIMP_API_KEY: ${MAILCHIMP_API_KEY:-}
+      HUBSPOT_ACCESS_TOKEN: ${HUBSPOT_ACCESS_TOKEN:-}
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY:-}
+      ENVIRONMENT: development
+      CORS_ORIGINS: "http://localhost:3999,http://localhost:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      # Hot-reload trong development
+      - ./backend:/app/backend
+      - ./fatigue_intelligence:/app/fatigue_intelligence
+    restart: unless-stopped
+    networks:
+      - cleaninbox_net
+    labels:
+      - "com.cleaninbox.service=api"
+
+  # ── 2. PostgreSQL Database ──────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: cleaninbox_db
+    environment:
+      POSTGRES_DB: cleaninbox_db
+      POSTGRES_USER: cleaninbox
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Init script: tạo extension UUID
+      - ./infra/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cleaninbox -d cleaninbox_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - cleaninbox_net
+
+  # ── 3. PgAdmin (DB Management UI) ──────────────────
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: cleaninbox_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@cleaninbox.ai
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    networks:
+      - cleaninbox_net
+    profiles:
+      - tools   # Chỉ chạy khi: docker compose --profile tools up
+
+  # ── 4. Frontend Static Server ───────────────────────
+  frontend:
+    image: node:20-alpine
+    container_name: cleaninbox_frontend
+    working_dir: /app
+    command: npx -y serve . -p 3999 --no-clipboard
+    ports:
+      - "3999:3999"
+    volumes:
+      - ./esg_dashboard:/app/esg_dashboard
+      - ./ethical_ux:/app/ethical_ux
+      - ./docs:/app/docs
+    restart: unless-stopped
+    networks:
+      - cleaninbox_net
+
+
+# ── Volumes & Networks ─────────────────────────────────
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  cleaninbox_net:
+    driver: bridge

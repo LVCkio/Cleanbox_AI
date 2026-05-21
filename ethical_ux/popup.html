@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CleanInbox AI — Ethical UX Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* ── Overlay nền mờ ── */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.4s ease;
+    }
+
+    /* ── Popup Card chính ── */
+    .popup {
+      background: linear-gradient(160deg, #1e1b4b 0%, #1a1a2e 60%, #16213e 100%);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 24px;
+      padding: 44px 40px 36px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow:
+        0 0 60px rgba(139, 92, 246, 0.15),
+        0 32px 64px rgba(0,0,0,0.5);
+      animation: slideUp 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Hiệu ứng ánh sáng nền */
+    .popup::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.2), transparent 70%);
+      pointer-events: none;
+    }
+
+    /* ── Icon trung tâm ── */
+    .icon-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .icon-circle {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+
+    /* ── Nội dung văn bản ── */
+    .tag {
+      display: inline-block;
+      background: rgba(139, 92, 246, 0.15);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      color: #a78bfa;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      color: #f0e6ff;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      color: #9ca3af;
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    .subtitle em {
+      color: #c4b5fd;
+      font-style: normal;
+      font-weight: 500;
+    }
+
+    /* ── BFS Score Badge ── */
+    .bfs-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 28px;
+    }
+
+    .bfs-badge .dot {
+      width: 10px; height: 10px;
+      background: #ef4444;
+      border-radius: 50%;
+      animation: blink 1.2s ease infinite;
+      flex-shrink: 0;
+    }
+
+    .bfs-badge span {
+      color: #fca5a5;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    /* ── Snooze Options ── */
+    .section-label {
+      color: #6b7280;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .snooze-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .snooze-btn {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 16px 8px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-align: center;
+      color: #e5e7eb;
+    }
+
+    .snooze-btn:hover {
+      background: rgba(139, 92, 246, 0.15);
+      border-color: rgba(139, 92, 246, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(139, 92, 246, 0.2);
+    }
+
+    .snooze-btn.selected {
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.3), rgba(168, 85, 247, 0.2));
+      border-color: #7c3aed;
+      box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+    }
+
+    .snooze-btn .days {
+      display: block;
+      font-size: 26px;
+      font-weight: 700;
+      color: #a78bfa;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .snooze-btn .label {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .divider span {
+      color: #4b5563;
+      font-size: 12px;
+    }
+
+    /* ── Action Buttons ── */
+    .btn-snooze-confirm {
+      display: block;
+      width: 100%;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 15px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      margin-bottom: 10px;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-snooze-confirm:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(124, 58, 237, 0.4);
+    }
+
+    .btn-unsubscribe {
+      display: block;
+      width: 100%;
+      background: transparent;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 14px;
+      padding: 13px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #f87171;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      margin-bottom: 16px;
+    }
+
+    .btn-unsubscribe:hover {
+      background: rgba(239, 68, 68, 0.08);
+      border-color: rgba(239, 68, 68, 0.6);
+    }
+
+    .btn-dismiss {
+      display: block;
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: #4b5563;
+      font-size: 13px;
+      cursor: pointer;
+      padding: 8px;
+      transition: color 0.2s;
+    }
+
+    .btn-dismiss:hover { color: #9ca3af; }
+
+    /* ── Success State ── */
+    .success-state {
+      text-align: center;
+      padding: 20px 0;
+      display: none;
+    }
+
+    .success-state .checkmark {
+      font-size: 48px;
+      margin-bottom: 16px;
+      animation: bounceIn 0.5s ease;
+    }
+
+    .success-state h3 {
+      color: #a78bfa;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .success-state p {
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(40px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.5); }
+      50% { box-shadow: 0 0 50px rgba(139, 92, 246, 0.8), 0 0 80px rgba(139, 92, 246, 0.3); }
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    @keyframes bounceIn {
+      0% { transform: scale(0); }
+      60% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="overlay" id="ethicalUxOverlay">
+  <div class="popup" id="mainPopup">
+
+    <!-- Icon -->
+    <div class="icon-wrap">
+      <div class="icon-circle">🌿</div>
+    </div>
+
+    <!-- Tag & Tiêu đề -->
+    <div style="text-align:center; margin-bottom:6px">
+      <span class="tag">✦ Chia tay văn minh</span>
+    </div>
+    <h2 style="text-align:center">Chúng tôi tôn trọng<br/>khoảng không gian của bạn</h2>
+
+    <p class="subtitle" style="text-align:center">
+      Dường như hộp thư của bạn đang <em>cần một khoảng nghỉ</em>. Thay vì để email trở thành gánh nặng — hãy để chúng tôi đề xuất một giải pháp thoải mái hơn cho cả hai bên.
+    </p>
+
+    <!-- BFS Alert -->
+    <div class="bfs-badge">
+      <div class="dot"></div>
+      <span>Chỉ số Brand Fatigue Score: <strong>87/100</strong> — Ngưỡng can thiệp được kích hoạt</span>
+    </div>
+
+    <!-- Main content (ẩn khi success) -->
+    <div id="mainContent">
+      <!-- Snooze Options -->
+      <p class="section-label">😴 Tạm nghỉ nhận thư</p>
+      <div class="snooze-options">
+        <button class="snooze-btn" id="snooze30" onclick="selectSnooze(30, this)">
+          <span class="days">30</span>
+          <span class="label">ngày</span>
+        </button>
+        <button class="snooze-btn" id="snooze60" onclick="selectSnooze(60, this)">
+          <span class="days">60</span>
+          <span class="label">ngày</span>
+        </button>
+        <button class="snooze-btn" id="snooze90" onclick="selectSnooze(90, this)">
+          <span class="days">90</span>
+          <span class="label">ngày</span>
+        </button>
+      </div>
+
+      <!-- Confirm Snooze -->
+      <button class="btn-snooze-confirm" id="snoozeConfirmBtn" onclick="confirmSnooze()" disabled
+        style="opacity:0.5; cursor:not-allowed;">
+        😴 Tạm nghỉ nhận thư
+      </button>
+
+      <div class="divider"><span>hoặc</span></div>
+
+      <!-- Unsubscribe -->
+      <button class="btn-unsubscribe" onclick="confirmUnsubscribe()">
+        🚪 Hủy đăng ký hoàn toàn
+      </button>
+
+      <!-- Dismiss -->
+      <button class="btn-dismiss" onclick="dismissPopup()">
+        Vẫn muốn tiếp tục nhận email →
+      </button>
+    </div>
+
+    <!-- Success State -->
+    <div class="success-state" id="successState">
+      <div class="checkmark">✅</div>
+      <h3 id="successTitle">Đã lưu lựa chọn!</h3>
+      <p id="successDesc">Chúng tôi sẽ liên hệ lại vào đúng thời điểm phù hợp.</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ─── State ───────────────────────────────
+  let selectedSnoozeDays = null;
+
+  // ─── Chọn snooze option ─────────────────
+  function selectSnooze(days, el) {
+    // Reset tất cả nút
+    document.querySelectorAll('.snooze-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedSnoozeDays = days;
+
+    // Kích hoạt nút xác nhận
+    const confirmBtn = document.getElementById('snoozeConfirmBtn');
+    confirmBtn.textContent = `😴 Tạm nghỉ ${days} ngày`;
+    confirmBtn.disabled = false;
+    confirmBtn.style.opacity = '1';
+    confirmBtn.style.cursor = 'pointer';
+  }
+
+  // ─── Xác nhận Snooze ────────────────────
+  function confirmSnooze() {
+    if (!selectedSnoozeDays) return;
+
+    // Tính ngày kết thúc snooze
+    const resumeDate = new Date();
+    resumeDate.setDate(resumeDate.getDate() + selectedSnoozeDays);
+    const resumeStr = resumeDate.toLocaleDateString('vi-VN', {
+      day: '2-digit', month: 'long', year: 'numeric'
+    });
+
+    // Mock API call — trong production: POST /api/contacts/snooze
+    console.log('[CleanInbox AI] Snooze action:', {
+      contactId: 'contact_004',
+      snooze_days: selectedSnoozeDays,
+      snooze_until: resumeDate.toISOString(),
+      action: 'snooze'
+    });
+
+    showSuccess(
+      `Đã tạm nghỉ ${selectedSnoozeDays} ngày 🌙`,
+      `Hộp thư của bạn sẽ được thở một chút. Chúng tôi sẽ gặp lại bạn sau ngày <strong>${resumeStr}</strong>.`
+    );
+  }
+
+  // ─── Xác nhận Hủy đăng ký ───────────────
+  function confirmUnsubscribe() {
+    if (!confirm('Bạn có chắc muốn hủy đăng ký hoàn toàn? Quyết định này có thể được thay đổi bất kỳ lúc nào.')) return;
+
+    // Mock API call — trong production: POST /api/contacts/unsubscribe
+    console.log('[CleanInbox AI] Unsubscribe action:', {
+      contactId: 'contact_004',
+      action: 'unsubscribe',
+      timestamp: new Date().toISOString()
+    });
+
+    showSuccess(
+      'Đã hủy đăng ký thành công 🌸',
+      'Cảm ơn bạn đã đồng hành! Dữ liệu của bạn được xóa theo đúng Nghị định 13/2023/NĐ-CP.'
+    );
+  }
+
+  // ─── Hiển thị Success State ──────────────
+  function showSuccess(title, desc) {
+    document.getElementById('mainContent').style.display = 'none';
+    const s = document.getElementById('successState');
+    document.getElementById('successTitle').innerHTML = title;
+    document.getElementById('successDesc').innerHTML = desc;
+    s.style.display = 'block';
+
+    // Tự đóng overlay sau 3.5 giây
+    setTimeout(closeOverlay, 3500);
+  }
+
+  // ─── Đóng popup ──────────────────────────
+  function dismissPopup() {
+    closeOverlay();
+    console.log('[CleanInbox AI] User dismissed — tiếp tục nhận email.');
+  }
+
+  function closeOverlay() {
+    const overlay = document.getElementById('ethicalUxOverlay');
+    overlay.style.opacity = '0';
+    overlay.style.transition = 'opacity 0.3s ease';
+    setTimeout(() => overlay.style.display = 'none', 300);
+  }
+</script>
+
+</body>
+</html>
