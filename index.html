@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CleanInbox AI — Hub Trung Tâm</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #0a0e17;
+      --card-bg: rgba(20, 26, 42, 0.6);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --primary: #9333ea;
+      --primary-glow: rgba(147, 51, 234, 0.4);
+      --secondary: #06b6d4;
+      --secondary-glow: rgba(6, 182, 212, 0.4);
+      --accent: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(147, 51, 234, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 40%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow-x: hidden;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      width: 100%;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 60px;
+      animation: fadeInDown 0.8s ease-out;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(147, 51, 234, 0.15);
+      border: 1px solid rgba(147, 51, 234, 0.3);
+      color: #c084fc;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #fff 30%, #a855f7 70%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      max-width: 640px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Cards Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+      margin-bottom: 60px;
+      animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 40px;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, transparent 50%, rgba(255, 255, 255, 0.03) 100%);
+      pointer-events: none;
+    }
+
+    /* Card Glows on Hover */
+    .card-esg:hover {
+      transform: translateY(-8px);
+      border-color: rgba(6, 182, 212, 0.4);
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.4),
+        0 0 40px var(--secondary-glow);
+    }
+
+    .card-ux:hover {
+      transform: translateY(-8px);
+      border-color: rgba(147, 51, 234, 0.4);
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.4),
+        0 0 40px var(--primary-glow);
+    }
+
+    .icon-wrapper {
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      font-size: 1.8rem;
+    }
+
+    .card-esg .icon-wrapper {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--secondary);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+    }
+
+    .card-ux .icon-wrapper {
+      background: rgba(147, 51, 234, 0.15);
+      color: var(--primary);
+      border: 1px solid rgba(147, 51, 234, 0.25);
+    }
+
+    .card-title {
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-desc {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      font-weight: 600;
+      font-size: 0.95rem;
+      gap: 6px;
+      transition: gap 0.2s;
+    }
+
+    .card-esg .card-footer {
+      color: var(--secondary);
+    }
+
+    .card-ux .card-footer {
+      color: var(--primary);
+    }
+
+    .card:hover .card-footer {
+      gap: 12px;
+    }
+
+    /* Info Banner */
+    .banner {
+      background: rgba(20, 26, 42, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 20px;
+      padding: 24px;
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      gap: 20px;
+      text-align: center;
+      animation: fadeInUp 0.8s ease-out 0.4s both;
+    }
+
+    .stat-item {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .stat-val {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #fff;
+    }
+
+    .stat-val.cyan { color: var(--secondary); }
+    .stat-val.purple { color: var(--primary); }
+    .stat-val.green { color: var(--accent); }
+
+    .stat-lbl {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 30px 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    footer a {
+      color: var(--text-main);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    footer a:hover {
+      color: var(--primary);
+    }
+
+    /* Keyframes */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      h1 { font-size: 2.5rem; }
+      .container { padding: 24px 16px; }
+      .grid { gap: 20px; }
+      .card { padding: 30px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="badge">
+        <span style="color: var(--accent);">●</span> Live Production Environment
+      </div>
+      <h1>CleanInbox AI</h1>
+      <p class="subtitle">SaaS Middleware tối ưu hóa chiến dịch tiếp thị qua email, lọc danh bạ thông minh giảm tỷ lệ mệt mỏi thương hiệu và phát thải carbon kỹ thuật số.</p>
+    </header>
+
+    <!-- Grid links -->
+    <div class="grid">
+      <!-- ESG Dashboard Card -->
+      <a href="esg_dashboard/dashboard.html" class="card card-esg">
+        <div>
+          <div class="icon-wrapper">📊</div>
+          <div class="card-title">ESG & CO2 Dashboard</div>
+          <p class="card-desc">Báo cáo trực quan lượng carbon kỹ thuật số được giảm thiểu, theo dõi ngân sách tiết kiệm và xuất dữ liệu tuân thủ tiêu chuẩn GHG Protocol Scope 3.</p>
+        </div>
+        <div class="card-footer">
+          Mở Dashboard <span>→</span>
+        </div>
+      </a>
+
+      <!-- Ethical UX Popup Card -->
+      <a href="ethical_ux/popup.html" class="card card-ux">
+        <div>
+          <div class="icon-wrapper">🛡️</div>
+          <div class="card-title">Ethical UX Widget</div>
+          <p class="card-desc">Widget "Tạm biệt văn minh" khi phát hiện khách hàng mệt mỏi (BFS cao). Cho phép Snooze (tạm dừng nhận tin) hoặc Unsubscribe để bảo vệ dữ liệu theo Nghị định 13/2023/NĐ-CP.</p>
+        </div>
+        <div class="card-footer">
+          Xem Demo Widget <span>→</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Stats Banner -->
+    <div class="banner">
+      <div class="stat-item">
+        <div class="stat-val cyan">-20%</div>
+        <div class="stat-lbl">Chi phí gửi Mail ảo</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val purple">+40%</div>
+        <div class="stat-lbl">Tỷ lệ Open Rate tối ưu</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val green">0.3g CO2</div>
+        <div class="stat-lbl">Tiết kiệm mỗi Email lọc</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2026 CleanInbox AI. Mã nguồn mở tại <a href="https://github.com/LVCkio/Cleanbox_AI" target="_blank">LVCkio/Cleanbox_AI</a>.</p>
+  </footer>
+
+</body>
+</html>
