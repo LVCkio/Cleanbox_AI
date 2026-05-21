@@ -321,6 +321,183 @@
       60% { transform: scale(1.2); }
       100% { transform: scale(1); }
     }
+
+    /* ── Settings Panel & Modal ── */
+    .btn-settings-floating {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: white;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 8px 32px rgba(124, 58, 237, 0.4);
+      z-index: 2000;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .btn-settings-floating:hover {
+      transform: rotate(45deg) scale(1.1);
+      box-shadow: 0 12px 40px rgba(124, 58, 237, 0.6);
+    }
+    .settings-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2001;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .settings-modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .settings-modal-card {
+      background: rgba(13, 21, 38, 0.95);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      border-radius: 24px;
+      padding: 32px;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+      position: relative;
+      color: #f0e6ff;
+    }
+    .settings-modal-overlay.active .settings-modal-card {
+      transform: translateY(0);
+    }
+    .settings-close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+      font-size: 24px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .settings-close-btn:hover {
+      color: #f0e6ff;
+    }
+    .settings-modal-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .settings-sub {
+      font-size: 13px;
+      color: #9ca3af;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .settings-group {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+    .settings-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #6b7280;
+      margin-bottom: 6px;
+    }
+    .settings-group input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #f0e6ff;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .settings-group input:focus {
+      border-color: #7c3aed;
+    }
+    .settings-mode-btn {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 10px;
+      color: #9ca3af;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .settings-mode-btn:hover {
+      background: rgba(255,255,255,0.08);
+      color: #f0e6ff;
+    }
+    .settings-mode-btn.active {
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.3), rgba(168, 85, 247, 0.2));
+      border-color: #7c3aed;
+      color: #f0e6ff;
+    }
+    .btn-connect {
+      background: #3b82f6;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-connect:hover {
+      opacity: 0.9;
+    }
+    .settings-status {
+      font-size: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.2);
+      color: #f59e0b;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: 500;
+    }
+    .settings-status.success {
+      background: rgba(16,185,129,0.08);
+      border-color: rgba(16,185,129,0.2);
+      color: #10b981;
+    }
+    .btn-save-settings {
+      width: 100%;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-save-settings:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(124,58,237,0.4);
+    }
   </style>
 </head>
 <body>
@@ -397,18 +574,68 @@
   </div>
 </div>
 
+<!-- Floating Settings Button -->
+<button class="btn-settings-floating" onclick="toggleSettingsModal()" title="Cấu hình Kết nối API">⚙️</button>
+
+<!-- Glassmorphic Settings Modal -->
+<div class="settings-modal-overlay" id="settingsOverlay" onclick="closeSettingsModalOutside(event)">
+  <div class="settings-modal-card">
+    <button class="settings-close-btn" onclick="toggleSettingsModal()">×</button>
+    <h3>⚙️ Cấu hình API Backend</h3>
+    <p class="settings-sub">Kết nối Popup với máy chủ Backend thực tế của bạn để xử lý Snooze / Unsubscribe real-time.</p>
+    
+    <div class="settings-group">
+      <label for="backendUrlInput">URL Backend API</label>
+      <input type="text" id="backendUrlInput" placeholder="http://127.0.0.1:8000" />
+    </div>
+    
+    <div class="settings-group">
+      <label>Chế độ hoạt động</label>
+      <div style="display:flex; gap:10px; margin-top:5px;">
+        <button class="settings-mode-btn" id="modeMockBtn" onclick="setMode('mock')">Mô phỏng (Mock)</button>
+        <button class="settings-mode-btn" id="modeLiveBtn" onclick="setMode('live')">Real-time API</button>
+      </div>
+    </div>
+    
+    <div id="liveSettingsArea" style="display:none;">
+      <div class="settings-group">
+        <label>Đăng nhập Backend (Lấy Token)</label>
+        <div style="display:flex; gap:6px; margin-top:5px;">
+          <input type="text" id="loginEmail" placeholder="admin@cleaninbox.ai" style="flex:1;" />
+          <input type="password" id="loginPassword" placeholder="demo1234" style="flex:1;" />
+          <button class="btn-connect" onclick="authenticateBackend()">Connect</button>
+        </div>
+      </div>
+      <div class="settings-group">
+        <label for="jwtTokenInput">Access Token JWT</label>
+        <input type="text" id="jwtTokenInput" placeholder="Tự động điền sau khi connect hoặc dán vào đây" />
+      </div>
+    </div>
+
+    <div class="settings-status" id="settingsStatus">Đang sử dụng dữ liệu mô phỏng.</div>
+    
+    <button class="btn-save-settings" onclick="saveSettings()">Áp Dụng Cấu Hình</button>
+  </div>
+</div>
+
 <script>
+  // ─── Cấu hình kết nối API ────────────────
+  let config = {
+    backendUrl: localStorage.getItem('CLEANBOX_BACKEND_URL') || 'http://127.0.0.1:8000',
+    mode: localStorage.getItem('CLEANBOX_MODE') || 'mock', // mock | live
+    token: localStorage.getItem('CLEANBOX_TOKEN') || ''
+  };
+
   // ─── State ───────────────────────────────
   let selectedSnoozeDays = null;
+  const targetContactId = 'contact_004'; // Mẫu contact ID
 
   // ─── Chọn snooze option ─────────────────
   function selectSnooze(days, el) {
-    // Reset tất cả nút
     document.querySelectorAll('.snooze-btn').forEach(b => b.classList.remove('selected'));
     el.classList.add('selected');
     selectedSnoozeDays = days;
 
-    // Kích hoạt nút xác nhận
     const confirmBtn = document.getElementById('snoozeConfirmBtn');
     confirmBtn.textContent = `😴 Tạm nghỉ ${days} ngày`;
     confirmBtn.disabled = false;
@@ -417,45 +644,99 @@
   }
 
   // ─── Xác nhận Snooze ────────────────────
-  function confirmSnooze() {
+  async function confirmSnooze() {
     if (!selectedSnoozeDays) return;
 
-    // Tính ngày kết thúc snooze
     const resumeDate = new Date();
     resumeDate.setDate(resumeDate.getDate() + selectedSnoozeDays);
     const resumeStr = resumeDate.toLocaleDateString('vi-VN', {
       day: '2-digit', month: 'long', year: 'numeric'
     });
 
-    // Mock API call — trong production: POST /api/contacts/snooze
-    console.log('[CleanInbox AI] Snooze action:', {
-      contactId: 'contact_004',
-      snooze_days: selectedSnoozeDays,
-      snooze_until: resumeDate.toISOString(),
-      action: 'snooze'
-    });
-
-    showSuccess(
-      `Đã tạm nghỉ ${selectedSnoozeDays} ngày 🌙`,
-      `Hộp thư của bạn sẽ được thở một chút. Chúng tôi sẽ gặp lại bạn sau ngày <strong>${resumeStr}</strong>.`
-    );
+    if (config.mode === 'live') {
+      const confirmBtn = document.getElementById('snoozeConfirmBtn');
+      confirmBtn.textContent = '⏳ Đang xử lý...';
+      confirmBtn.disabled = true;
+      
+      try {
+        const response = await fetch(`${config.backendUrl}/api/v1/ethical-ux/snooze`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${config.token}`
+          },
+          body: JSON.stringify({
+            contact_id: targetContactId,
+            snooze_days: selectedSnoozeDays
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Yêu cầu không hợp lệ hoặc hết hạn token.');
+        }
+        
+        const resData = await response.json();
+        showSuccess(
+          `Đã tạm nghỉ ${selectedSnoozeDays} ngày 🌙`,
+          `${resData.message}`
+        );
+      } catch (err) {
+        console.error(err);
+        alert(`Lỗi kết nối API: ${err.message}. Đã chuyển sang chế độ mô phỏng offline.`);
+        showSuccess(
+          `Đã tạm nghỉ ${selectedSnoozeDays} ngày 🌙`,
+          `Hộp thư của bạn sẽ được thở một chút. Chúng tôi sẽ gặp lại bạn sau ngày <strong>${resumeStr}</strong>.`
+        );
+      }
+    } else {
+      showSuccess(
+        `Đã tạm nghỉ ${selectedSnoozeDays} ngày 🌙`,
+        `Hộp thư của bạn sẽ được thở một chút. Chúng tôi sẽ gặp lại bạn sau ngày <strong>${resumeStr}</strong>.`
+      );
+    }
   }
 
   // ─── Xác nhận Hủy đăng ký ───────────────
-  function confirmUnsubscribe() {
+  async function confirmUnsubscribe() {
     if (!confirm('Bạn có chắc muốn hủy đăng ký hoàn toàn? Quyết định này có thể được thay đổi bất kỳ lúc nào.')) return;
 
-    // Mock API call — trong production: POST /api/contacts/unsubscribe
-    console.log('[CleanInbox AI] Unsubscribe action:', {
-      contactId: 'contact_004',
-      action: 'unsubscribe',
-      timestamp: new Date().toISOString()
-    });
-
-    showSuccess(
-      'Đã hủy đăng ký thành công 🌸',
-      'Cảm ơn bạn đã đồng hành! Dữ liệu của bạn được xóa theo đúng Nghị định 13/2023/NĐ-CP.'
-    );
+    if (config.mode === 'live') {
+      try {
+        const response = await fetch(`${config.backendUrl}/api/v1/ethical-ux/unsubscribe`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${config.token}`
+          },
+          body: JSON.stringify({
+            contact_id: targetContactId,
+            reason: 'irrelevant'
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Yêu cầu không hợp lệ hoặc hết hạn token.');
+        }
+        
+        const resData = await response.json();
+        showSuccess(
+          'Đã hủy đăng ký thành công 🌸',
+          `${resData.message}`
+        );
+      } catch (err) {
+        console.error(err);
+        alert(`Lỗi kết nối API: ${err.message}. Đã chuyển sang chế độ mô phỏng offline.`);
+        showSuccess(
+          'Đã hủy đăng ký thành công 🌸',
+          'Cảm ơn bạn đã đồng hành! Dữ liệu của bạn được xóa theo đúng Nghị định 13/2023/NĐ-CP.'
+        );
+      }
+    } else {
+      showSuccess(
+        'Đã hủy đăng ký thành công 🌸',
+        'Cảm ơn bạn đã đồng hành! Dữ liệu của bạn được xóa theo đúng Nghị định 13/2023/NĐ-CP.'
+      );
+    }
   }
 
   // ─── Hiển thị Success State ──────────────
@@ -466,8 +747,7 @@
     document.getElementById('successDesc').innerHTML = desc;
     s.style.display = 'block';
 
-    // Tự đóng overlay sau 3.5 giây
-    setTimeout(closeOverlay, 3500);
+    setTimeout(closeOverlay, 4500);
   }
 
   // ─── Đóng popup ──────────────────────────
@@ -482,6 +762,117 @@
     overlay.style.transition = 'opacity 0.3s ease';
     setTimeout(() => overlay.style.display = 'none', 300);
   }
+
+  // ─── Settings Modal Logic ────────────────────
+  function toggleSettingsModal() {
+    const overlay = document.getElementById('settingsOverlay');
+    overlay.classList.toggle('active');
+    
+    document.getElementById('backendUrlInput').value = config.backendUrl;
+    document.getElementById('jwtTokenInput').value = config.token;
+    
+    updateModeButtons();
+    updateStatusMessage();
+  }
+
+  function closeSettingsModalOutside(e) {
+    if (e.target.id === 'settingsOverlay') {
+      toggleSettingsModal();
+    }
+  }
+
+  function setMode(mode) {
+    config.mode = mode;
+    updateModeButtons();
+    updateStatusMessage();
+  }
+
+  function updateModeButtons() {
+    const mockBtn = document.getElementById('modeMockBtn');
+    const liveBtn = document.getElementById('modeLiveBtn');
+    const liveArea = document.getElementById('liveSettingsArea');
+    
+    if (config.mode === 'live') {
+      liveBtn.classList.add('active');
+      mockBtn.classList.remove('active');
+      liveArea.style.display = 'block';
+    } else {
+      mockBtn.classList.add('active');
+      liveBtn.classList.remove('active');
+      liveArea.style.display = 'none';
+    }
+  }
+
+  function updateStatusMessage() {
+    const statusEl = document.getElementById('settingsStatus');
+    if (config.mode === 'live') {
+      if (config.token) {
+        statusEl.textContent = '🔌 Sẵn sàng kết nối API real-time với token đã nhập.';
+        statusEl.className = 'settings-status success';
+      } else {
+        statusEl.textContent = '⚠️ Chế độ API yêu cầu Access Token để xác thực.';
+        statusEl.className = 'settings-status';
+      }
+    } else {
+      statusEl.textContent = '🟢 Đang sử dụng dữ liệu mô phỏng Offline.';
+      statusEl.className = 'settings-status success';
+    }
+  }
+
+  async function authenticateBackend() {
+    const email = document.getElementById('loginEmail').value.trim() || 'admin@cleaninbox.ai';
+    const password = document.getElementById('loginPassword').value || 'demo1234';
+    const statusEl = document.getElementById('settingsStatus');
+    
+    statusEl.textContent = '⚡ Đang đăng nhập...';
+    statusEl.className = 'settings-status';
+    
+    try {
+      const formData = new URLSearchParams();
+      formData.append('username', email);
+      formData.append('password', password);
+      
+      const response = await fetch(`${config.backendUrl}/api/v1/auth/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: formData
+      });
+      
+      if (!response.ok) {
+        throw new Error('Sai tài khoản hoặc mật khẩu.');
+      }
+      
+      const data = await response.json();
+      document.getElementById('jwtTokenInput').value = data.access_token;
+      config.token = data.access_token;
+      
+      statusEl.textContent = '✅ Đăng nhập thành công! Token đã được tự động điền.';
+      statusEl.className = 'settings-status success';
+    } catch (err) {
+      statusEl.textContent = `❌ Đăng nhập thất bại: ${err.message}`;
+      statusEl.className = 'settings-status';
+    }
+  }
+
+  function saveSettings() {
+    const newUrl = document.getElementById('backendUrlInput').value.trim() || 'http://127.0.0.1:8000';
+    const newToken = document.getElementById('jwtTokenInput').value.trim();
+    
+    config.backendUrl = newUrl;
+    config.token = newToken;
+    
+    localStorage.setItem('CLEANBOX_BACKEND_URL', config.backendUrl);
+    localStorage.setItem('CLEANBOX_MODE', config.mode);
+    localStorage.setItem('CLEANBOX_TOKEN', config.token);
+    
+    toggleSettingsModal();
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    updateModeButtons();
+  });
 </script>
 
 </body>

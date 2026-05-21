@@ -349,6 +349,181 @@
     }
 
     .kpi-value { animation: countUp 0.8s ease both; }
+
+    /* ── Settings Panel & Modal ── */
+    .btn-settings-floating {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--violet), var(--blue));
+      border: 1px solid rgba(255,255,255,0.15);
+      color: white;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 8px 32px rgba(124, 58, 237, 0.4);
+      z-index: 1000;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .btn-settings-floating:hover {
+      transform: rotate(45deg) scale(1.1);
+      box-shadow: 0 12px 40px rgba(124, 58, 237, 0.6);
+    }
+    .settings-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1001;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .settings-modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .settings-modal-card {
+      background: rgba(13, 21, 38, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+      position: relative;
+    }
+    .settings-modal-overlay.active .settings-modal-card {
+      transform: translateY(0);
+    }
+    .settings-close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .settings-close-btn:hover {
+      color: var(--text-main);
+    }
+    .settings-modal-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .settings-sub {
+      font-size: 13px;
+      color: var(--text-sub);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .settings-group {
+      margin-bottom: 16px;
+    }
+    .settings-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .settings-group input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: var(--text-main);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .settings-group input:focus {
+      border-color: var(--violet);
+    }
+    .settings-mode-btn {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      color: var(--text-sub);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .settings-mode-btn:hover {
+      background: rgba(255,255,255,0.08);
+      color: var(--text-main);
+    }
+    .settings-mode-btn.active {
+      background: linear-gradient(135deg, var(--violet-dim), rgba(124,58,237,0.3));
+      border-color: var(--violet);
+      color: var(--text-main);
+    }
+    .btn-connect {
+      background: var(--blue);
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-connect:hover {
+      opacity: 0.9;
+    }
+    .settings-status {
+      font-size: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.2);
+      color: var(--amber);
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: 500;
+    }
+    .settings-status.success {
+      background: rgba(16,185,129,0.08);
+      border-color: rgba(16,185,129,0.2);
+      color: var(--green);
+    }
+    .btn-save-settings {
+      width: 100%;
+      background: linear-gradient(135deg, var(--violet), #a855f7);
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-save-settings:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(124,58,237,0.4);
+    }
   </style>
 </head>
 <body>
@@ -486,15 +661,57 @@
       </div>
     </div>
 
-  </div><!-- /bottom-grid -->
 </div><!-- /dashboard -->
+
+<!-- Floating Settings Button -->
+<button class="btn-settings-floating" onclick="toggleSettingsModal()" title="Cấu hình Kết nối API">⚙️</button>
+
+<!-- Glassmorphic Settings Modal -->
+<div class="settings-modal-overlay" id="settingsOverlay" onclick="closeSettingsModalOutside(event)">
+  <div class="settings-modal-card">
+    <button class="settings-close-btn" onclick="toggleSettingsModal()">×</button>
+    <h3>⚙️ Cấu hình API Backend</h3>
+    <p class="settings-sub">Kết nối Dashboard với máy chủ Backend thực tế của bạn để lấy dữ liệu real-time.</p>
+    
+    <div class="settings-group">
+      <label for="backendUrlInput">URL Backend API</label>
+      <input type="text" id="backendUrlInput" placeholder="http://127.0.0.1:8000" />
+    </div>
+    
+    <div class="settings-group">
+      <label>Chế độ hoạt động</label>
+      <div style="display:flex; gap:10px; margin-top:5px;">
+        <button class="settings-mode-btn" id="modeMockBtn" onclick="setMode('mock')">Mô phỏng (Mock)</button>
+        <button class="settings-mode-btn" id="modeLiveBtn" onclick="setMode('live')">Real-time API</button>
+      </div>
+    </div>
+    
+    <div id="liveSettingsArea" style="display:none;">
+      <div class="settings-group">
+        <label>Đăng nhập Backend (Lấy Token)</label>
+        <div style="display:flex; gap:6px; margin-top:5px;">
+          <input type="text" id="loginEmail" placeholder="admin@cleaninbox.ai" style="flex:1;" />
+          <input type="password" id="loginPassword" placeholder="demo1234" style="flex:1;" />
+          <button class="btn-connect" onclick="authenticateBackend()">Connect</button>
+        </div>
+      </div>
+      <div class="settings-group">
+        <label for="jwtTokenInput">Access Token JWT</label>
+        <input type="text" id="jwtTokenInput" placeholder="Tự động điền sau khi connect hoặc dán vào đây" />
+      </div>
+    </div>
+
+    <div class="settings-status" id="settingsStatus">Đang sử dụng dữ liệu mô phỏng.</div>
+    
+    <button class="btn-save-settings" onclick="saveSettings()">Áp Dụng Cấu Hình</button>
+  </div>
+</div>
 
 <script>
   // ─────────────────────────────────────────────
-  // DỮ LIỆU MÔ PHỎNG (Mock Data)
-  // Trong production: fetch từ /api/esg/summary
+  // CẤU HÌNH & KẾT NỐI API REAL-TIME
   // ─────────────────────────────────────────────
-  const ESG_DATA = {
+  const MOCK_ESG_DATA = {
     emailsFiltered: 2480000,       // Tổng email đã lọc
     costPerEmail:   0.02,          // USD / email
     co2PerEmail:    0.3,           // grams CO2 / email
@@ -510,12 +727,72 @@
     ]
   };
 
-  // ─── Tính toán ───────────────────────────────
-  const totalCO2Grams = ESG_DATA.emailsFiltered * ESG_DATA.co2PerEmail;
-  const totalCO2Kg    = totalCO2Grams / 1000;
-  const totalCO2Ton   = totalCO2Kg / 1000;
-  const costSaved     = ESG_DATA.emailsFiltered * ESG_DATA.costPerEmail;
-  const progressPct   = Math.min((totalCO2Kg / ESG_DATA.targetCO2Kg) * 100, 100);
+  let config = {
+    backendUrl: localStorage.getItem('CLEANBOX_BACKEND_URL') || 'http://127.0.0.1:8000',
+    mode: localStorage.getItem('CLEANBOX_MODE') || 'mock', // mock | live
+    token: localStorage.getItem('CLEANBOX_TOKEN') || ''
+  };
+
+  let activeData = { ...MOCK_ESG_DATA };
+
+  // ─── Tính toán các giá trị phái sinh ─────────
+  let totalCO2Grams = activeData.emailsFiltered * activeData.co2PerEmail;
+  let totalCO2Kg    = totalCO2Grams / 1000;
+  let totalCO2Ton   = totalCO2Kg / 1000;
+  let costSaved     = activeData.emailsFiltered * activeData.costPerEmail;
+  let progressPct   = Math.min((totalCO2Kg / activeData.targetCO2Kg) * 100, 100);
+
+  function recalculateDerivatives() {
+    totalCO2Grams = activeData.emailsFiltered * activeData.co2PerEmail;
+    totalCO2Kg    = totalCO2Grams / 1000;
+    totalCO2Ton   = totalCO2Kg / 1000;
+    costSaved     = activeData.emailsFiltered * activeData.costPerEmail;
+    progressPct   = Math.min((totalCO2Kg / activeData.targetCO2Kg) * 100, 100);
+  }
+
+  // ─── Fetch dữ liệu từ Live API ───────────────
+  async function fetchLiveData() {
+    if (config.mode !== 'live') {
+      activeData = { ...MOCK_ESG_DATA };
+      recalculateDerivatives();
+      return false;
+    }
+    
+    try {
+      const response = await fetch(`${config.backendUrl}/api/v1/esg/summary`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${config.token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Lỗi HTTP: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      activeData = {
+        emailsFiltered: data.overall.emails_filtered,
+        costPerEmail: 0.02,
+        co2PerEmail: 0.3,
+        targetCO2Kg: data.overall.target_kg,
+        monthly: data.monthly.map((m, idx) => ({
+          month: m.month,
+          co2kg: m.co2_kg,
+          current: idx === data.monthly.length - 1
+        }))
+      };
+      
+      recalculateDerivatives();
+      return true;
+    } catch (err) {
+      console.error('Không thể lấy dữ liệu ESG từ Backend, đang dùng dữ liệu offline:', err);
+      activeData = { ...MOCK_ESG_DATA };
+      recalculateDerivatives();
+      return false;
+    }
+  }
 
   // ─── Hàm định dạng số ────────────────────────
   function formatNumber(n) {
@@ -548,12 +825,10 @@
 
   // ─── Render KPI Cards ────────────────────────
   function renderKPIs() {
-    // Emails filtered
-    animateCount(document.getElementById('kpiEmailsFiltered'), ESG_DATA.emailsFiltered, 2000);
+    animateCount(document.getElementById('kpiEmailsFiltered'), activeData.emailsFiltered, 1500);
 
-    // Cost saved
     const costEl = document.getElementById('kpiCostSaved');
-    const costStep = costSaved / (2000 / 16);
+    const costStep = costSaved / (1500 / 16);
     let c = 0;
     function updateCost() {
       c = Math.min(c + costStep, costSaved);
@@ -562,13 +837,11 @@
     }
     requestAnimationFrame(updateCost);
 
-    // CO2
     const co2 = formatCO2(totalCO2Grams);
     document.getElementById('kpiCO2Unit').textContent = ' ' + co2.unit;
-    animateCount(document.getElementById('kpiCO2'), parseFloat(co2.val), 2000);
+    animateCount(document.getElementById('kpiCO2'), parseFloat(co2.val), 1500);
 
-    // Progress %
-    animateCount(document.getElementById('kpiProgress'), Math.round(progressPct), 1500);
+    animateCount(document.getElementById('kpiProgress'), Math.round(progressPct), 1200);
   }
 
   // ─── Render Progress Bar ─────────────────────
@@ -576,7 +849,7 @@
     setTimeout(() => {
       document.getElementById('progressFill').style.width = progressPct.toFixed(1) + '%';
       document.getElementById('progressText').textContent =
-        totalCO2Kg.toFixed(1) + ' kg / 1,500 kg';
+        totalCO2Kg.toFixed(1) + ' kg / ' + activeData.targetCO2Kg.toLocaleString() + ' kg';
       document.getElementById('progressPct').textContent =
         progressPct.toFixed(1) + '% hoàn thành';
     }, 300);
@@ -585,9 +858,10 @@
   // ─── Render Monthly Chart ────────────────────
   function renderChart() {
     const area = document.getElementById('chartArea');
-    const maxCO2 = Math.max(...ESG_DATA.monthly.map(m => m.co2kg));
+    area.innerHTML = '';
+    const maxCO2 = Math.max(...activeData.monthly.map(m => m.co2kg));
 
-    ESG_DATA.monthly.forEach(m => {
+    activeData.monthly.forEach(m => {
       const heightPct = (m.co2kg / maxCO2) * 100;
       const col = document.createElement('div');
       col.className = 'bar-col';
@@ -606,29 +880,27 @@
       col.appendChild(lbl);
       area.appendChild(col);
 
-      // Animate bar height
       setTimeout(() => {
         bar.style.height = heightPct + '%';
       }, 200);
     });
   }
 
-  // ─── Export Report (Mock) ────────────────────
+  // ─── Export Report ───────────────────────────
   function exportReport() {
     const report = {
       generated_at: new Date().toISOString(),
       period: '2025-01 to 2025-05',
-      emails_filtered: ESG_DATA.emailsFiltered,
+      emails_filtered: activeData.emailsFiltered,
       cost_saved_usd: costSaved.toFixed(2),
       co2_saved_kg: totalCO2Kg.toFixed(2),
       co2_saved_ton: totalCO2Ton.toFixed(4),
       progress_to_target_pct: progressPct.toFixed(1),
-      target_kg: ESG_DATA.targetCO2Kg,
+      target_kg: activeData.targetCO2Kg,
       standard: 'GHG Protocol Scope 3 — Category 11',
       compliance: 'Nghị định 13/2023/NĐ-CP',
     };
 
-    // Tạo file JSON download
     const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -638,11 +910,154 @@
     URL.revokeObjectURL(url);
   }
 
-  // ─── Init ────────────────────────────────────
-  window.addEventListener('DOMContentLoaded', () => {
+  // ─── Settings Modal Logic ────────────────────
+  function toggleSettingsModal() {
+    const overlay = document.getElementById('settingsOverlay');
+    overlay.classList.toggle('active');
+    
+    document.getElementById('backendUrlInput').value = config.backendUrl;
+    document.getElementById('jwtTokenInput').value = config.token;
+    
+    updateModeButtons();
+    updateStatusMessage();
+  }
+
+  function closeSettingsModalOutside(e) {
+    if (e.target.id === 'settingsOverlay') {
+      toggleSettingsModal();
+    }
+  }
+
+  function setMode(mode) {
+    config.mode = mode;
+    updateModeButtons();
+    updateStatusMessage();
+  }
+
+  function updateModeButtons() {
+    const mockBtn = document.getElementById('modeMockBtn');
+    const liveBtn = document.getElementById('modeLiveBtn');
+    const liveArea = document.getElementById('liveSettingsArea');
+    
+    if (config.mode === 'live') {
+      liveBtn.classList.add('active');
+      mockBtn.classList.remove('active');
+      liveArea.style.display = 'block';
+    } else {
+      mockBtn.classList.add('active');
+      liveBtn.classList.remove('active');
+      liveArea.style.display = 'none';
+    }
+  }
+
+  function updateStatusMessage() {
+    const statusEl = document.getElementById('settingsStatus');
+    if (config.mode === 'live') {
+      if (config.token) {
+        statusEl.textContent = '🔌 Sẵn sàng kết nối API real-time với token đã nhập.';
+        statusEl.className = 'settings-status success';
+      } else {
+        statusEl.textContent = '⚠️ Chế độ API yêu cầu Access Token để xác thực.';
+        statusEl.className = 'settings-status';
+      }
+    } else {
+      statusEl.textContent = '🟢 Đang sử dụng dữ liệu mô phỏng Offline.';
+      statusEl.className = 'settings-status success';
+    }
+  }
+
+  async function authenticateBackend() {
+    const email = document.getElementById('loginEmail').value.trim() || 'admin@cleaninbox.ai';
+    const password = document.getElementById('loginPassword').value || 'demo1234';
+    const statusEl = document.getElementById('settingsStatus');
+    
+    statusEl.textContent = '⚡ Đang đăng nhập...';
+    statusEl.className = 'settings-status';
+    
+    try {
+      const formData = new URLSearchParams();
+      formData.append('username', email);
+      formData.append('password', password);
+      
+      const response = await fetch(`${config.backendUrl}/api/v1/auth/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: formData
+      });
+      
+      if (!response.ok) {
+        throw new Error('Sai tài khoản hoặc mật khẩu.');
+      }
+      
+      const data = await response.json();
+      document.getElementById('jwtTokenInput').value = data.access_token;
+      config.token = data.access_token;
+      
+      statusEl.textContent = '✅ Đăng nhập thành công! Token đã được tự động điền.';
+      statusEl.className = 'settings-status success';
+    } catch (err) {
+      statusEl.textContent = `❌ Đăng nhập thất bại: ${err.message}`;
+      statusEl.className = 'settings-status';
+    }
+  }
+
+  async function saveSettings() {
+    const newUrl = document.getElementById('backendUrlInput').value.trim() || 'http://127.0.0.1:8000';
+    const newToken = document.getElementById('jwtTokenInput').value.trim();
+    
+    config.backendUrl = newUrl;
+    config.token = newToken;
+    
+    localStorage.setItem('CLEANBOX_BACKEND_URL', config.backendUrl);
+    localStorage.setItem('CLEANBOX_MODE', config.mode);
+    localStorage.setItem('CLEANBOX_TOKEN', config.token);
+    
+    toggleSettingsModal();
+    await reloadDashboard();
+  }
+
+  async function reloadDashboard() {
+    const liveBadge = document.querySelector('.badge-live');
+    if (config.mode === 'live') {
+      liveBadge.innerHTML = '<div class="dot" style="background:#3b82f6;"></div>Đang kết nối API...';
+      liveBadge.style.color = '#3b82f6';
+      liveBadge.style.borderColor = 'rgba(59,130,246,0.3)';
+      liveBadge.style.background = 'rgba(59,130,246,0.1)';
+    } else {
+      liveBadge.innerHTML = '<div class="dot"></div>Offline Demo';
+      liveBadge.style.color = '#10b981';
+      liveBadge.style.borderColor = 'rgba(16,185,129,0.3)';
+      liveBadge.style.background = 'rgba(16,185,129,0.1)';
+    }
+
+    const isConnected = await fetchLiveData();
+    
+    if (config.mode === 'live') {
+      if (isConnected) {
+        liveBadge.innerHTML = '<div class="dot"></div>Live API';
+        liveBadge.style.color = '#10b981';
+        liveBadge.style.borderColor = 'rgba(16,185,129,0.3)';
+        liveBadge.style.background = 'rgba(16,185,129,0.1)';
+      } else {
+        liveBadge.innerHTML = '<div class="dot" style="background:#ef4444;"></div>Lỗi kết nối API';
+        liveBadge.style.color = '#ef4444';
+        liveBadge.style.borderColor = 'rgba(239,68,68,0.3)';
+        liveBadge.style.background = 'rgba(239,68,68,0.1)';
+      }
+    }
+    
+    // Re-render
     renderKPIs();
     renderProgress();
     renderChart();
+  }
+
+  // ─── Init ────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', async () => {
+    // Tự động load dữ liệu (lấy từ live hoặc mock)
+    await reloadDashboard();
   });
 </script>
 

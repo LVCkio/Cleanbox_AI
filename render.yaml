@@ -1,0 +1,35 @@
+# ─────────────────────────────────────────────────────
+# Render.com Infrastructure-as-Code Blueprint
+# Một click để tự động deploy toàn bộ hệ thống CleanInbox AI
+# ─────────────────────────────────────────────────────
+services:
+  - type: web
+    name: cleaninbox-backend
+    env: docker
+    dockerfilePath: Dockerfile
+    plan: free
+    healthCheckPath: /health
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT --workers 2
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cleaninbox-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ENVIRONMENT
+        value: production
+      - key: CORS_ORIGINS
+        value: "*" # Cho phép frontend từ GitHub Pages gọi API
+      - key: MAILCHIMP_API_KEY
+        sync: false
+      - key: HUBSPOT_ACCESS_TOKEN
+        sync: false
+      - key: SENDGRID_API_KEY
+        sync: false
+
+databases:
+  - name: cleaninbox-db
+    plan: free
+    databaseName: cleaninbox
+    user: cleaninbox_admin
