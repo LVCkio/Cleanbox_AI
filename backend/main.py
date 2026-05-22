@@ -26,11 +26,11 @@ async def lifespan(app: FastAPI):
     # Startup: tạo tất cả tables nếu chưa tồn tại
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    print("✅ Database tables initialized")
+    print("[OK] Database tables initialized")
     yield
     # Shutdown
     await engine.dispose()
-    print("🔌 Database connection closed")
+    print("[INFO] Database connection closed")
 
 
 # ─── FastAPI App ─────────────────────────────────────
